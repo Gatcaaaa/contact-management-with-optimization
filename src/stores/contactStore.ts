@@ -18,8 +18,14 @@ export const useContactStore = defineStore('contact', {
     totalItems: 0,
 
     isSyncing: false,
-    lastUpdated: null as string | null
+    lastUpdated: null as string | null,
+
+    scannedResult: [] as any
   }),
+  persist: {
+    key: "hasil-scan-qrcode",
+    pick: ['scannedResult']
+  },
   actions: {
     getCacheKey(page: number) {
       return `${BASE_URL}/contacts?page=${page}&limit=${this.itemsPerPage}`
@@ -39,7 +45,6 @@ export const useContactStore = defineStore('contact', {
           this.contacts = result.data
           this.totalPages = result.meta.totalPages
           this.totalItems = result.meta.totalItems
-          console.log(`Page ${page} dimuat dari Cache`)
         } else {
           console.log(`Cache Page ${page} kosong, fetch dari network...`)
           await this.refreshDataFromNetwork(page)
@@ -49,7 +54,6 @@ export const useContactStore = defineStore('contact', {
         await this.refreshDataFromNetwork(page)
       }
     },
-
     async refreshDataFromNetwork(page: number) {
       try {
         const cacheKey = this.getCacheKey(page);
@@ -71,8 +75,6 @@ export const useContactStore = defineStore('contact', {
           headers: { 'Content-Type': 'application/json' }
         })
         await cache.put(cacheKey, jsonResponse)
-
-        console.log(`Cache Page ${page} diperbarui dari Network`)
       } catch (error) {
         console.error('Gagal fetch network:', error)
       }
@@ -82,7 +84,7 @@ export const useContactStore = defineStore('contact', {
       this.isSyncing = true
 
       try {
-        console.log(' Sync Background dimulai...')
+        console.log('Sync Background dimulai...')
         await api.post('/contacts/sync')
         console.log('Sync Selesai. Refresh halaman aktif...')
 
@@ -94,11 +96,25 @@ export const useContactStore = defineStore('contact', {
         this.isSyncing = false
       }
     },
-
     async changePage(newPage: number) {
       if (newPage > 0 && newPage <= this.totalPages) {
         await this.fetchContacts(newPage);
       }
+    },
+
+    addScanResult(data: any) {
+      const exist = this.scannedResult.find((item: any) => item.rawValue === data.rawValue)
+
+      if (!exist) {
+        this.scannedResult.push(data)
+      }
+    },
+
+    clearScannedResults() {
+      this.scannedResult = []
+    },
+
+    saveScannedDataToContacts() {
     }
   },
   getters: {

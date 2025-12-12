@@ -71,7 +71,6 @@ export class ContactService {
     }
 
     async createContact(data: { first_name: string; last_name: string; email: string; phone: string }) {
-        // Bisa tambah validasi email duplikat disini jika mau
         return this.contactRepository.create(data);
     }
 
@@ -82,7 +81,6 @@ export class ContactService {
     }
 
     async deleteContact(id: number) {
-        // Cek dulu ada ga orangnya
         await this.getContactDetail(id);
         return this.contactRepository.delete(id);
     }
