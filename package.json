@@ -19,9 +19,13 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
+    "@vueuse/core": "^14.1.0",
+    "@vueuse/integrations": "^14.1.0",
+    "async-validator": "^4.2.5",
     "axios": "^1.13.2",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^4.1.17",
     "vue": "^3.5.25",
     "vue-qrcode-reader": "^5.7.3",

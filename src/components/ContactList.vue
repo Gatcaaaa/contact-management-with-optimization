@@ -259,7 +259,7 @@ onMounted(async () => {
     >
       <div class="p-6">
         <RouterLink
-          :to="`/dashboard/contacts/${contact.id}`"
+          :to="`/detail/${contact.id}`"
           class="flex items-start mb-6 cursor-pointer group"
         >
           <div
@@ -316,10 +316,11 @@ onMounted(async () => {
         class="bg-gray-900 bg-opacity-50 px-6 py-3 border-t border-gray-700 flex justify-end gap-2"
       >
         <RouterLink
-          :to="`/dashboard/contacts/${contact.id}`"
-          class="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider flex items-center"
+          :to="`/detail/${contact.id}`"
+          class="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider flex items-center group"
         >
-          View Details <i class="fas fa-arrow-right ml-1"></i>
+          <span class="mr-2">Generate QR</span>
+          <i class="fas fa-qrcode transform group-hover:scale-110 transition-transform"></i>
         </RouterLink>
       </div>
     </div>

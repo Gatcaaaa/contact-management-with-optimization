@@ -1,4 +1,5 @@
 
+import ContactDetail from '@/components/ContactDetail.vue'
 import ContactList from '@/components/ContactList.vue'
 import ContactLayout from '@/layout/ContactLayout.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -15,12 +16,13 @@ const router = createRouter({
           name: "home",
           component: ContactList,
         },
-        // Nanti jika kamu mau buat halaman create/detail, tambahkan di sini:
-        // { path: 'create', component: CreateContact },
-        // { path: ':id', component: DetailContact },
+        {
+          path: '/detail/:id',
+          name: 'ContactDetail',
+          component: ContactDetail
+        }
       ]
     },
-    // Opsional: Redirect sembarang URL balik ke home
     {
       path: '/:pathMatch(.*)*',
       redirect: '/'
