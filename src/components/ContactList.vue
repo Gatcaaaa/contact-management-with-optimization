@@ -3,8 +3,16 @@ import { useContactStore } from '@/stores/contactStore'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { QrcodeStream } from 'vue-qrcode-reader'
+import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
+import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
+import Button from 'primevue/button'
+import ContactPdfExport from '@/components/pdf/ContactPdfExport.vue'
 
 const contactStore = useContactStore()
+const confirm = useConfirm()
+const toast = useToast()
 const {
   contacts,
   isSyncing,
@@ -79,6 +87,35 @@ const displayedPages = computed(() => {
   return range
 })
 
+const confirmSync = () => {
+  confirm.require({
+    message: 'Proses ini akan mensinkronisasi data dengan server. Lanjutkan?',
+    header: 'Konfirmasi Sinkronisasi',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Batal',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Ya, Sinkronisasi',
+      severity: 'info',
+    },
+    accept: () => {
+      contactStore.syncAndRefresh()
+      toast.add({
+        severity: 'info',
+        summary: 'Sync Started',
+        detail: 'Sinkronisasi berjalan di background',
+        life: 3000,
+      })
+    },
+    reject: () => {
+      toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 })
+    },
+  })
+}
+
 const getAvatarColor = (id: number) => {
   const colors = [
     'bg-blue-500',
@@ -93,7 +130,6 @@ const getAvatarColor = (id: number) => {
 
 onMounted(async () => {
   await contactStore.fetchContacts(1)
-  contactStore.syncAndRefresh()
 })
 </script>
 
@@ -116,22 +152,19 @@ onMounted(async () => {
         <span class="hidden md:inline text-sm font-semibold">Scan</span>
       </button>
 
-      <div
-        v-if="isSyncing"
-        class="flex items-center bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-full text-sm border border-yellow-500/20 animate-pulse"
-      >
-        <i class="fas fa-sync fa-spin mr-2"></i>
-        <span>Syncing data...</span>
+      <Toast />
+      <ConfirmDialog></ConfirmDialog>
+      <div class="card flex gap-3 items-center">
+        <ContactPdfExport />
+        <Button
+          label="sinkronisasi"
+          :loading="isSyncing"
+          @click="confirmSync"
+          severity="secondary"
+          outlined
+          color="#143bd9"
+        />
       </div>
-
-      <button
-        @click="contactStore.syncAndRefresh()"
-        :disabled="isSyncing"
-        class="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-lg border border-gray-700 transition-colors disabled:opacity-50"
-        title="Force Sync"
-      >
-        <i class="fas fa-sync" :class="{ 'fa-spin': isSyncing }"></i>
-      </button>
 
       <div class="text-gray-400 text-sm bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
         Total: <span class="text-blue-400 font-bold">{{ totalItems }}</span>
@@ -319,8 +352,7 @@ onMounted(async () => {
           :to="`/detail/${contact.id}`"
           class="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider flex items-center group"
         >
-          <span class="mr-2">Generate QR</span>
-          <i class="fas fa-qrcode transform group-hover:scale-110 transition-transform"></i>
+          <span class="mr-2 font-bold">Generate QR</span>
         </RouterLink>
       </div>
     </div>

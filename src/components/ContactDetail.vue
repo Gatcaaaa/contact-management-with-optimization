@@ -65,9 +65,9 @@ onMounted(async () => {
   <div class="max-w-full mx-auto animate-fade-in">
     <button
       @click="router.back()"
-      class="mb-6 flex items-center text-gray-400 hover:text-white transition-colors"
+      class="mb-3 flex items-center font-bold text-gray-400 hover:text-white transition-colors"
     >
-      <i class="fas fa-arrow-left mr-2"></i> Back to List
+      Kembali
     </button>
 
     <div v-if="contact" class="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <style>
+      body {
+        font-family: 'Helvetica', sans-serif;
+        padding: 40px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .meta {
+        margin-bottom: 20px;
+        text-align: right;
+        color: #666;
+        font-size: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        font-size: 14px;
+      }
+      th {
+        background-color: #f2f2f2;
+        color: #333;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Contact List Report</h1>
+    <div class='meta'>
+      Generated on:
+      {{generatedDate}}<br />
+      Total Contacts:
+      {{totalData}}
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each contacts}}
+          <tr>
+            <td>{{this.id}}</td>
+            <td>{{this.first_name}} {{this.last_name}}</td>
+            <td>{{this.email}}</td>
+            <td>{{this.phone}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </body>
+</html>

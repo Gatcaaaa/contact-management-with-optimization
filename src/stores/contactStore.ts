@@ -6,7 +6,7 @@ const BASE_URL = 'http://localhost:3000/api'
 const CACHE_NAME = 'contact-app-v1'
 
 const api = axios.create({
-  baseURL: BASE_URL
+  baseURL: BASE_URL,
 })
 export const useContactStore = defineStore('contact', {
   state: () => ({
@@ -20,21 +20,20 @@ export const useContactStore = defineStore('contact', {
     isSyncing: false,
     lastUpdated: null as string | null,
 
-    scannedResult: [] as any
+    scannedResult: [] as any,
   }),
   persist: {
-    key: "hasil-scan-qrcode",
-    pick: ['scannedResult']
+    key: 'hasil-scan-qrcode',
+    pick: ['scannedResult'],
   },
   actions: {
     getCacheKey(page: number) {
       return `${BASE_URL}/contacts?page=${page}&limit=${this.itemsPerPage}`
     },
 
-
     async fetchContacts(page: number = 1) {
-      this.currentPage = page;
-      const cacheKey = this.getCacheKey(page);
+      this.currentPage = page
+      const cacheKey = this.getCacheKey(page)
 
       try {
         const cache = await caches.open(CACHE_NAME)
@@ -56,10 +55,10 @@ export const useContactStore = defineStore('contact', {
     },
     async refreshDataFromNetwork(page: number) {
       try {
-        const cacheKey = this.getCacheKey(page);
+        const cacheKey = this.getCacheKey(page)
 
         const response = await api.get<PaginatedResponse>(`/contacts`, {
-          params: { page, limit: this.itemsPerPage }
+          params: { page, limit: this.itemsPerPage },
         })
 
         const freshData = response.data
@@ -69,10 +68,9 @@ export const useContactStore = defineStore('contact', {
         this.totalItems = freshData.meta.totalItems
         this.lastUpdated = new Date().toLocaleTimeString()
 
-
         const cache = await caches.open(CACHE_NAME)
         const jsonResponse = new Response(JSON.stringify(freshData), {
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         })
         await cache.put(cacheKey, jsonResponse)
       } catch (error) {
@@ -86,10 +84,23 @@ export const useContactStore = defineStore('contact', {
       try {
         console.log('Sync Background dimulai...')
         await api.post('/contacts/sync')
+
+        let isQueueEmpty = false
+        while (!isQueueEmpty) {
+          await new Promise((resolve) => setTimeout(resolve, 2000))
+
+          const statusRes = await api.get('/contacts/queue')
+          const { waiting, active } = statusRes.data
+
+          console.log(`Status Queue: Waiting=${waiting}, Active=${active}`)
+
+          if (waiting === 0 && active === 0) {
+            isQueueEmpty = true
+          }
+        }
         console.log('Sync Selesai. Refresh halaman aktif...')
 
         await this.refreshDataFromNetwork(this.currentPage)
-
       } catch (error) {
         console.error('Gagal sync:', error)
       } finally {
@@ -98,7 +109,7 @@ export const useContactStore = defineStore('contact', {
     },
     async changePage(newPage: number) {
       if (newPage > 0 && newPage <= this.totalPages) {
-        await this.fetchContacts(newPage);
+        await this.fetchContacts(newPage)
       }
     },
 
@@ -114,10 +125,9 @@ export const useContactStore = defineStore('contact', {
       this.scannedResult = []
     },
 
-    saveScannedDataToContacts() {
-    }
+    saveScannedDataToContacts() {},
   },
   getters: {
-    totalContacts: (state) => state.contacts.length
-  }
+    totalContacts: (state) => state.contacts.length,
+  },
 })

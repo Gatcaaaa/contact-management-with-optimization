@@ -24,3 +24,14 @@ model Contact {
 
   @@map("contacts")
 }
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  title      String 
+  status     String
+  file_data  String?  @db.LongText
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("reports")
+}
